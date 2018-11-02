@@ -523,19 +523,21 @@ class Client
      */
     public function insert($table, $values, $columns = [])
     {
-        $sql = 'INSERT INTO ' . $table;
+        $sql = [];
+        $sql[] = 'INSERT INTO ' . $table;
 
         if (0 !== count($columns)) {
-            $sql .= ' (' . implode(',', $columns) . ') ';
+            $sql[] = ' (' . implode(',', $columns) . ') ';
         }
 
-        $sql .= ' VALUES ';
+        $sql[] = ' VALUES ';
 
         foreach ($values as $row) {
-            $sql .= ' (' . FormatLine::Insert($row) . '), ';
+            $sql[] = ' (' . FormatLine::Insert($row) . '), ';
         }
-        $sql = trim($sql, ', ');
-        return $this->transport()->write($sql);
+        $sql[count($sql)-1] = trim($sql[count($sql)-1], ', ');
+	
+        return $this->transport()->write(implode('', $sql));
     }
 
     /**
